@@ -1,0 +1,58 @@
+---
+title: "CODEBOOK"
+author: "Tingting"
+date: "7 5 2019"
+output: html_document
+---
+## https://github.com/rubenarslan/codebook
+
+## Generate markdown codebooks from the attributes of the variables in  data frame
+```{r setup}
+knitr::opts_chunk$set(
+  warning = TRUE, # show warnings during codebook generation
+  message = TRUE, # show messages during codebook generation
+  error = TRUE, # do not interrupt codebook generation in case of errors,
+                # usually makes debugging easier, and sometimes half a codebook
+                # is better than none
+  echo = FALSE  # don't show the R code
+)
+ggplot2::theme_set(ggplot2::theme_bw())
+
+pander::panderOptions("table.split.table", Inf)
+
+load("C:/Users/tingtinf/Downloads/t1.RData") 
+codebook_data = t1
+```
+
+##Sometimes, the metadata is not set up in such a way that codebook can leverage it fully. These functions help fix this.
+
+```{r codebook}
+library(codebook) # load the package
+# omit the following lines, if your missing values are already properly labelled
+codebook_data <- detect_missing(codebook_data,
+    only_labelled = TRUE, # only labelled values are autodetected as
+                                   # missing
+    negative_values_are_missing = FALSE, # negative values are NOT missing values
+    ninety_nine_problems = TRUE,   # 99/999 are missing values, if they
+                                   # are more than 5 MAD from the median
+    )
+```
+
+# If you are not using formr, the codebook package needs to guess which items
+# form a scale. The following line finds item aggregates with names like this:
+# scale = scale_1 + scale_2R + scale_3R
+# identifying these aggregates allows the codebook function to
+# automatically compute reliabilities.
+# However, it will not reverse items automatically.
+
+
+```{r}
+codebook_data <- detect_scales(codebook_data)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+#generating a codebook is as simple as calling codebook from a chunk in an rmarkdown document.
+```{r}
+codebook(codebook_data)
+```
